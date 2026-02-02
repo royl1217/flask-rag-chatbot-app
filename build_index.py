@@ -2,7 +2,8 @@ import os
 from dotenv import load_dotenv
 from langchain_community.document_loaders import PyPDFLoader, UnstructuredPDFLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from langchain_huggingface import HuggingFaceEmbeddings
+from langchain_huggingface import HuggingFaceEmbeddings, HuggingFaceEndpointEmbeddings
+from langchain_openai import OpenAIEmbeddings
 from langchain_community.vectorstores import FAISS
 
 load_dotenv()
@@ -44,6 +45,12 @@ def build_index():
         model_name="sentence-transformers/all-MiniLM-L6-v2",
         model_kwargs={"device": "cpu"}
     )
+    # embeddings = OpenAIEmbeddings(
+    #     model="sentence-transformers/all-MiniLM-L6-v2",
+    #     api_key=os.getenv("DEEPINFRA_API_KEY"),
+    #     base_url="https://api.deepinfra.com/v1/openai"
+    # )
+
 
     print("Generating embeddings...")
     vectorstore = FAISS.from_documents(chunks, embeddings)

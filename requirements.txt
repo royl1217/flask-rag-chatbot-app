@@ -12,4 +12,5 @@ unstructured
 huggingface-hub
 numpy
 scikit-learn
+sentence-transformers
 gunicorn

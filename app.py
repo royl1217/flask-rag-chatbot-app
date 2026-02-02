@@ -3,8 +3,8 @@ from dotenv import load_dotenv
 from flask import Flask, render_template, request, jsonify
 
 from langchain_community.vectorstores import FAISS
-from langchain_huggingface import HuggingFaceEmbeddings
-from langchain_openai import ChatOpenAI
+from langchain_huggingface import HuggingFaceEmbeddings, HuggingFaceEndpointEmbeddings
+from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 from langchain_core.prompts import PromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 
@@ -17,6 +17,14 @@ embeddings = HuggingFaceEmbeddings(
     model_name="sentence-transformers/all-MiniLM-L6-v2",
     model_kwargs={"device": "cpu"}
 )
+
+# embeddings = OpenAIEmbeddings(
+#     model="sentence-transformers/all-MiniLM-L6-v2",
+#     api_key=os.getenv("DEEPINFRA_API_KEY"),
+#     base_url="https://api.deepinfra.com/v1/openai"
+# )
+
+
 
 # Load FAISS index
 vectorstore = FAISS.load_local(
