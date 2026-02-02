@@ -3,7 +3,7 @@ python-dotenv
 langchain
 langchain-community
 langchain-openai
-sentence-transformers==2.2.2
+sentence-transformers==2.2.2 --no-deps
 faiss-cpu
 requests
 unstructured
