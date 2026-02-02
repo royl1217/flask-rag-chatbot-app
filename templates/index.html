@@ -3,15 +3,12 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>RAG Gemma Chatbot</title>
+    <title>RAG Chatbot</title>
 
-    <!-- Bootstrap 5 -->
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
       rel="stylesheet"
     />
-
-    <!-- Bootstrap Icons -->
     <link
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"
@@ -32,24 +29,6 @@
         border-radius: 16px;
         padding: 30px;
         box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
-        animation: fadeIn 0.5s ease-in-out;
-      }
-
-      @keyframes fadeIn {
-        from {
-          opacity: 0;
-          transform: translateY(10px);
-        }
-        to {
-          opacity: 1;
-          transform: translateY(0);
-        }
-      }
-
-      .chat-header {
-        font-weight: 700;
-        font-size: 1.6rem;
-        color: #2c3e50;
       }
 
       .chat-bubble-user {
@@ -59,7 +38,9 @@
         margin-bottom: 12px;
         max-width: 80%;
         margin-left: auto;
-        animation: fadeIn 0.3s ease-in-out;
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
       }
 
       .chat-bubble-bot {
@@ -68,81 +49,110 @@
         border-radius: 14px;
         margin-bottom: 12px;
         max-width: 80%;
-        animation: fadeIn 0.3s ease-in-out;
+        display: flex;
+        align-items: flex-start;
       }
 
-      .icon {
-        font-size: 1.2rem;
-        margin-right: 6px;
+      .avatar {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        margin-right: 10px;
+      }
+
+      .avatar-user {
+        margin-left: 10px;
+        margin-right: 0;
       }
 
       #loadingSpinner {
         display: none;
-      }
-
-      .input-area {
-        position: sticky;
-        bottom: 0;
-        background: white;
-        padding-top: 10px;
       }
     </style>
   </head>
 
   <body>
     <div class="chat-container">
-      <h3 class="text-center chat-header mb-4">
-        <i class="bi bi-chat-dots-fill text-primary"></i>
-        Office Document Chatbot
+      <h3 class="text-center mb-4">
+        <img
+          src="https://cdn-icons-png.flaticon.com/512/4712/4712100.png"
+          width="45"
+          class="me-2"
+          style="vertical-align: middle"
+        />
+        RAG LLama Chatbot
       </h3>
 
-      <!-- Chat history -->
-      <div id="chatArea">
-        {% if answer %}
-        <div class="chat-bubble-user">
-          <i class="bi bi-person-circle icon text-primary"></i>
-          <strong>You:</strong> {{ request.form.get("question") }}
-        </div>
+      <div id="chatArea"></div>
 
-        <div class="chat-bubble-bot">
-          <i class="bi bi-robot icon text-success"></i>
-          <strong>Bot:</strong> {{ answer }}
-        </div>
-        {% endif %}
-      </div>
-
-      <!-- Loading Spinner -->
       <div id="loadingSpinner" class="text-center my-3">
         <div class="spinner-border text-primary" role="status"></div>
         <p class="mt-2">Thinking...</p>
       </div>
 
-      <!-- Input Form -->
-      <div class="input-area">
-        <form method="POST" onsubmit="showLoading()">
-          <div class="input-group">
-            <span class="input-group-text bg-white">
-              <i class="bi bi-pencil-square text-primary"></i>
-            </span>
-            <input
-              type="text"
-              name="question"
-              class="form-control"
-              placeholder="Ask something about your documents..."
-              required
-            />
-            <button class="btn btn-primary" type="submit">
-              <i class="bi bi-send-fill"></i> Ask
-            </button>
-          </div>
-        </form>
-      </div>
+      <form id="chatForm">
+        <div class="input-group">
+          <span class="input-group-text bg-white">
+            <i class="bi bi-pencil-square text-primary"></i>
+          </span>
+          <input
+            type="text"
+            id="questionInput"
+            class="form-control"
+            placeholder="Ask something about your documents..."
+            required
+          />
+          <button class="btn btn-primary" type="submit">
+            <i class="bi bi-send-fill"></i> Ask
+          </button>
+        </div>
+      </form>
     </div>
 
     <script>
-      function showLoading() {
-        document.getElementById("loadingSpinner").style.display = "block";
-      }
+      const chatArea = document.getElementById("chatArea");
+      const spinner = document.getElementById("loadingSpinner");
+      const form = document.getElementById("chatForm");
+      const input = document.getElementById("questionInput");
+
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const question = input.value.trim();
+        if (!question) return;
+
+        // User bubble
+        chatArea.innerHTML += `
+          <div class="chat-bubble-user">
+            <div><strong>You:</strong> ${question}</div>
+            <img src="https://cdn-icons-png.flaticon.com/512/456/456212.png"
+                 class="avatar avatar-user" />
+          </div>
+        `;
+
+        input.value = "";
+        spinner.style.display = "block";
+
+        const response = await fetch("/ask", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ question }),
+        });
+
+        const data = await response.json();
+        spinner.style.display = "none";
+
+        // Bot bubble
+        chatArea.innerHTML += `
+          <div class="chat-bubble-bot">
+            <img src="https://cdn-icons-png.flaticon.com/512/4712/4712100.png"
+                 class="avatar" />
+            <div><strong>Bot:</strong> ${data.answer}</div>
+          </div>
+        `;
+
+        chatArea.scrollTop = chatArea.scrollHeight;
+      });
     </script>
   </body>
 </html>
