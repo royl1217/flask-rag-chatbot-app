@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: flask-rag-chatbot-app
+    env: python
+    plan: free
+    buildCommand: ""
+    startCommand: python app.py
+    envVars:
+      - key: DEEPINFRA_API_KEY
+        sync: false
+      - key: OPEMAI_API_KEY
+        sync: false
+      - key: DEEPINFRA_MODEL
+        value: google/gemma-2-9b-it
