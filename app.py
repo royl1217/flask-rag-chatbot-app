@@ -13,17 +13,16 @@ load_dotenv()
 app = Flask(__name__)
 
 # Embeddings (must match build_index.py)
-embeddings = HuggingFaceEmbeddings(
-    model_name="sentence-transformers/all-MiniLM-L6-v2",
-    model_kwargs={"device": "cpu"}
-)
-
-# embeddings = OpenAIEmbeddings(
-#     model="sentence-transformers/all-MiniLM-L6-v2",
-#     api_key=os.getenv("DEEPINFRA_API_KEY"),
-#     base_url="https://api.deepinfra.com/v1/openai"
+# embeddings = HuggingFaceEmbeddings(
+#     model_name="sentence-transformers/all-MiniLM-L6-v2",
+#     model_kwargs={"device": "cpu"}
 # )
-
+embeddings = OpenAIEmbeddings(
+    model="sentence-transformers/all-MiniLM-L6-v2",
+    api_key=os.getenv("DEEPINFRA_API_KEY"),
+    base_url="https://api.deepinfra.com/v1/openai",
+    check_embedding_ctx_length=False # Prevents local token counting errors
+)
 
 
 # Load FAISS index
